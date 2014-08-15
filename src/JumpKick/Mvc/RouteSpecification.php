@@ -6,10 +6,14 @@ class RouteSpecification implements Route {
 	
 	private $pattern;
 	private $params;
+	private $defaultcontroller;
+	private $defaultaction;
 	
-	
-	function __construct($urlpattern) {
+	function __construct($urlpattern,$defaultcontroller="Default",$defaultaction="Index") {
 		$this->pattern = $urlpattern;
+		
+		$this->defaultcontroller = $defaultcontroller;
+		$this->defaultaction = $defaultaction;
 	}
 	
 	
@@ -24,17 +28,23 @@ class RouteSpecification implements Route {
 
 		preg_match("/^".$regexpattern."$/",$url,$matches);
 		
-		unset($matches[0]);
-		$matches = array_values($matches);
-		
-		if(count($segments)!=count($matches)) {
+		if(count($matches) == 0) {
 			return FALSE;
+		} else {			
+			if(count($segments)) {
+				unset($matches[0]);
+				if(count($segments)!=count($matches)) {
+					return FALSE;
+				}
+				$matches = array_values($matches);			
+				$this->params = array_combine($segments,$matches);
+				
+				return count($this->params)>0;
+			} else {
+				return true;
+			}
 		}
-		
-		
-		$this->params = array_combine($segments,$matches);
 	
-		return TRUE;
 	}
 	
 	
@@ -52,11 +62,11 @@ class RouteSpecification implements Route {
 	
 	
 	function getDefaultController() {
-		return "Default";
+		return $this->defaultcontroller;
 	}
 	
 	function getDefaultAction() {
-		return "Default";
+		return $this->defaultaction;
 	}
 }
 	

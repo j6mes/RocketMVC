@@ -4,9 +4,13 @@ namespace JumpKick\Mvc;
 
 class RouteInstance {
 	private $controller;
-	function __construct($controller,$action) {
+	private $action;
+	private $params;
+	
+	function __construct($controller,$action, $params) {
 		$this->controller = $controller;
 		$this->action = $action;
+		$this->params = $params;
 	}
 	
 	function getController() {
@@ -17,6 +21,9 @@ class RouteInstance {
 		return $this->action;
 	}
 	
+	function getParams() {
+		return $this->params;
+	}
 	
 }
 	
