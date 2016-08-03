@@ -1,12 +1,16 @@
 <?php
 namespace JumpKick\Mvc;
 
+use JumpKick\TinyType\Exception\NotFoundException;
+
 abstract class WebApp {
 	public $s;	
 	private $router; 
 	
 	function __construct()
 	{
+		session_start();
+		
 		$this->router = new UrlRouter();
 		$this->initRoutes($this->router);
 		$this->initAuthentication();
@@ -14,6 +18,11 @@ abstract class WebApp {
 		$url = "";
 		if(isset($_GET['url'])) {
 			$url = $_GET['url'];
+
+            if(substr($url, -1) == '/') {
+                header("Location: /".rtrim($url, '/') );
+            }
+
 		}
 		
 		$route = $this->router->getRouteForUrl($url);
@@ -22,7 +31,14 @@ abstract class WebApp {
 			$controllerName = $this->getControllerNamespace() . "\\" . $routeimpl->getController();
 			
 			$controller = new $controllerName();
-			$controller->{$routeimpl->getAction()}();
+
+            try {
+			    $controller->{$routeimpl->getAction()}($routeimpl->getParams());
+            } catch(NotFoundException $e) {
+                header("HTTP/1.0 404 Not Found");
+                header("Location:/");
+            }
+
 		} else {
 			die("No route to page");
 		}

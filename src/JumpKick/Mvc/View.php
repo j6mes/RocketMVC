@@ -5,25 +5,36 @@ class View
 {
 	public $context;
 	private $global;
-	public function render($name, $args = array())
+    private $title = "";
+    private $template = "template";
+    public  $approot = "JumpKick/TinyType";
+
+
+	public function renderNoView() {
+		require_once("{$this->approot}/Template/{$this->template}.php");
+	}
+
+	public function render($name, $model)
 	{
-		
-		$this->args = $args;
-		require_once("JumpKick/VoteMate/View/{$name}.php");
+
+		require_once("{$this->approot}/View/{$name}.php");
 	
 		$this->content = ob_get_clean();
 
 
-		require_once("JumpKick/VoteMate/Template/template.php");
+		require_once("{$this->approot}/Template/{$this->template}.php");
 	}
+
+
+    public function setTemplate($template) {
+        $this->template = $template;
+    }
 	
-	
-	public function fragment($name,$args=array())
+	public function partial($name,$model)
 	{
 		ob_start();
-		$this->args = $args;
-		require("application/fragments/{$name}.php");
-		$this->fragments[$name][] = ob_get_clean();
+		require_once("JumpKick/TinyType/ViewPartial/{$name}.php");
+		$this->partial[$name] = ob_get_clean();
 		
 	}
 	
@@ -33,9 +44,8 @@ class View
 	}
 	
 	
-	public function json($view,$arg=array())
+	public function json($arg=array())
 	{
-		
 		die (json_encode($arg));
 	} 
 	
